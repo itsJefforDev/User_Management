@@ -1,0 +1,53 @@
+los deberan ser visibles dependiendo del ROL del usuario
+
+modulo -> funcionalidad
+Dashboard financiero -> visual
+
+modulo de autenticacion
+modulo de cuentas bancarias
+	visualizacion de cuentas bancarias
+	creacion de cuentas bancarias
+	busqueda y filtrado de cuentas bancarias
+	eliminacion de cuentas bancarias
+	edicion de las cuentas bancarias
+	
+	
+modulo de gastos (CRUD y mas funcionalidades)
+	visualizacion de gastos
+	creacion de gastos
+	busqueda y filtrado de gastos
+	eliminacion de gastos
+	edicion de las gastos
+
+
+modulo de ingresos
+	visualizacion de ingresos
+	creacion de ingresos
+	busqueda y filtrado de ingresos
+	eliminacion de ingresos
+	edicion de las ingresos
+
+
+modulo de categorias
+	visualizacion de categorias
+	creacion de categorias
+	busqueda y filtrado de categorias
+	eliminacion de categorias
+	edicion de las categorias
+	
+
+modulo de ahorros (meta de ahorros)
+	visualizacion de ahorros
+	creacion de ahorros
+	busqueda y filtrado de ahorros
+	eliminacion de ahorros
+	edicion de las ahorros
+	
+
+modulo auditoria
+
+
+modulo de reportes (gastos, ingresos, etc)
+
+modulo de notificaciones
+
