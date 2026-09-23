@@ -17,6 +17,7 @@ public class Usuario {
     private Long id;
 
     private String cedula;
+    private String email;
     private String nombre;
     private String apellido;
     private int edad;
