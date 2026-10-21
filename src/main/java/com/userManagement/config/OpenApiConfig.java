@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
         ),
         servers = {  // Define los servidores donde está disponible tu API
                 @Server(
-                        url = "http://localhost:8080",
+                        url = "http://localhost:8080/userManagement",
                         description = "Servidor de Desarrollo"  // Este aparece en el dropdown de Swagger
                 ),
                 @Server(
