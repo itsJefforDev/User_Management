@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.userManagement'
@@ -24,6 +25,7 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -39,8 +41,44 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	testImplementation 'org.mockito:mockito-core:5.11.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+
+	implementation 'org.mapstruct:mapstruct:1.6.3'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacoco{
+	toolVersion = '0.8.14'
+}
+
+jacocoTestReport{
+	dependsOn test
+	reports{
+		xml.required = true
+		html.required = true
+	}
+	finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification{
+	violationRules{
+		rule{
+			limit{
+				counter = 'LINE'
+				minimum = 0.6
+			}
+
+			limit{
+				counter = 'BRANCH'
+				minimum = 0.5
+			}
+		}
+	}
 }
