@@ -4,4 +4,7 @@ Empresarial apps proyect subject with the objetive to understant how the big qpp
 Context:
 Financial web application
 
+Requirements:
+
 Spring boot
+Java 17
