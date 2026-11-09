@@ -9,3 +9,5 @@ technical Requirements:
 Spring boot
 Java 17
 Gradle
+
+Arquitecture: Layers
