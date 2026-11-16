@@ -28,14 +28,22 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/users").permitAll()
+                        // 1. PRIMERO: Todas las rutas públicas de autenticación y documentación de Swagger
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/api/v1/users",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+                        // 2. SEGUNDO: Cualquier otra ruta requiere token JWT
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // Ya no es necesario pasar el authenticationProvider explícitamente,
-                // Spring Boot toma el UserDetailsService y PasswordEncoder automáticamente.
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
