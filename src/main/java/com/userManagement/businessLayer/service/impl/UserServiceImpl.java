@@ -1,6 +1,7 @@
 package com.userManagement.businessLayer.service.impl;
 
 import com.userManagement.businessLayer.dto.UserDTOs.*;
+import com.userManagement.businessLayer.service.EmailService; // Asegúrate de tener este servicio inyectado
 import com.userManagement.businessLayer.service.UserService;
 import com.userManagement.persistenceLayer.entity.Role;
 import com.userManagement.persistenceLayer.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +28,9 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final EmailService emailService; // Servicio para enviar el correo de confirmación
 
+    // 1. Creado por el ADMINISTRADOR (Nace ACTIVO por defecto)
     @Override
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
@@ -42,7 +46,6 @@ public class UserServiceImpl implements UserService {
                 roles.add(role);
             }
         } else {
-            // Asignar rol por defecto si no se especifican roles
             Role defaultRole = roleRepository.findByName("ROLE_USER")
                     .orElseThrow(() -> new RuntimeException("Rol por defecto ROLE_USER no encontrado"));
             roles.add(defaultRole);
@@ -52,13 +55,62 @@ public class UserServiceImpl implements UserService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .status(UserStatus.ACTIVE)
+                .status(UserStatus.ACTIVE) // El admin crea cuentas activas directamente
                 .failedLoginAttempts(0)
                 .roles(roles)
                 .build();
 
         User savedUser = userRepository.save(user);
         return userMapper != null ? userMapper.toResponse(savedUser) : mapToResponseFallback(savedUser);
+    }
+
+    // 2. NUEVO: Registro por primera vez por parte del USUARIO (Nace INACTIVE y con token de verificación)
+    @Override
+    @Transactional
+    public UserResponse registerUser(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("El email ya se encuentra registrado");
+        }
+
+        // Asignar rol por defecto para autoregistro
+        Set<Role> roles = new HashSet<>();
+        Role defaultRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Rol por defecto ROLE_USER no encontrado"));
+        roles.add(defaultRole);
+
+        // Generar token único de verificación
+        String verificationToken = UUID.randomUUID().toString();
+
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .status(UserStatus.INACTIVE) // Inactivo hasta que confirme su correo
+                .verificationToken(verificationToken)
+                .failedLoginAttempts(0)
+                .roles(roles)
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        // Enviar el correo electrónico con el enlace de verificación
+        emailService.sendVerificationEmail(savedUser.getEmail(), verificationToken);
+
+        return userMapper != null ? userMapper.toResponse(savedUser) : mapToResponseFallback(savedUser);
+    }
+
+    // 3. NUEVO: Lógica para verificar la cuenta cuando el usuario hace clic en el enlace
+    @Override
+    @Transactional
+    public String verifyAccount(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new RuntimeException("Token de verificación inválido o expirado."));
+
+        user.setStatus(UserStatus.ACTIVE); // Activamos la cuenta
+        user.setVerificationToken(null);  // Limpiamos el token para que no se pueda reutilizar
+        userRepository.save(user);
+
+        return "¡Cuenta verificada exitosamente! Ya puedes iniciar sesión.";
     }
 
     @Override
@@ -147,5 +199,11 @@ public class UserServiceImpl implements UserService {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }
