@@ -38,6 +38,9 @@ public class User {
     @Builder.Default
     private Integer failedLoginAttempts = 0;
 
+    @Column(name = "verification_token", nullable = false, length = 255)
+    private String verificationToken;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

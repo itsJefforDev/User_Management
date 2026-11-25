@@ -17,4 +17,12 @@ public interface UserService {
 
     @Transactional
     void resetFailedLoginAttempts(String email);
+
+    // 1. Agregar la firma del autoregistro
+    UserResponse registerUser(CreateUserRequest request);
+
+    // 2. Agregar la firma de la verificación de cuenta
+    String verifyAccount(String token);
+
+    boolean existsByEmail(String email);
 }
