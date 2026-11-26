@@ -18,11 +18,21 @@ public interface UserService {
     @Transactional
     void resetFailedLoginAttempts(String email);
 
-    // 1. Agregar la firma del autoregistro
+    // Auto-registro (queda INACTIVE y recibe un código de 4 dígitos)
     UserResponse registerUser(CreateUserRequest request);
 
-    // 2. Agregar la firma de la verificación de cuenta
+    // Activación por enlace (flujo del administrador)
     String verifyAccount(String token);
 
+    // Activación por código de 4 dígitos (flujo de auto-registro)
+    String verifyCode(String email, String code);
+
+    void resendVerificationCode(String email);
+
     boolean existsByEmail(String email);
+
+    // Administrador: contraseña temporal aleatoria y envío del correo de activación
+    TemporaryPasswordResponse generateTemporaryPassword();
+
+    void sendActivationEmail(Long id);
 }

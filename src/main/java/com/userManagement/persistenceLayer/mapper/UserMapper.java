@@ -20,6 +20,8 @@ public class UserMapper {
                 .status(user.getStatus())
                 .failedLoginAttempts(user.getFailedLoginAttempts())
                 .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
+                .mustChangePassword(user.getMustChangePassword())
+                .temporaryPasswordExpiresAt(user.getTemporaryPasswordExpiresAt())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();

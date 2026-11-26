@@ -1,5 +1,6 @@
 package com.userManagement.presentationLayer.controller;
 
+import com.userManagement.businessLayer.dto.AuthDTOs.MessageResponse;
 import com.userManagement.businessLayer.dto.UserDTOs.*;
 import com.userManagement.businessLayer.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,19 @@ public class UserController {
     public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest request) {
         UserResponse response = userService.createUser(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    // Contraseña temporal aleatoria de 8 dígitos para el formulario del administrador
+    @GetMapping("/temporary-password")
+    public ResponseEntity<TemporaryPasswordResponse> generateTemporaryPassword() {
+        return ResponseEntity.ok(userService.generateTemporaryPassword());
+    }
+
+    // Envía el correo de activación por enlace a una cuenta inactiva
+    @PostMapping("/{id}/send-activation")
+    public ResponseEntity<MessageResponse> sendActivationEmail(@PathVariable Long id) {
+        userService.sendActivationEmail(id);
+        return ResponseEntity.ok(new MessageResponse("Correo de activación enviado correctamente."));
     }
 
     @GetMapping("/{id}")
